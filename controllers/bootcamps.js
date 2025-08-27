@@ -7,27 +7,52 @@ const qs=require('qs')
 //@route GET /api/v1/bootcamps
 //access private
 
-exports.getBootCamps = asyncHandler(async (req, res, next) => {
-  let query;
+    exports.getBootCamps = asyncHandler(async (req, res, next) => {
+    let query;
+    //copy req.query
+    let reqQuery={...req.query}
+    //    let queryObj = qs.parse(reqQuery);
 
-  // Parse query string properly
-  let queryObj = qs.parse(req.query);
+    //    console.log(queryObj)
 
-  let queryStr = JSON.stringify(queryObj);
+    const removeFeilds=['select','sort']
+    // Parse query string properly
+    //   let queryObj = qs.parse(req.query);
+    //loop over remove feilds and delete them from redQuery
+    removeFeilds.forEach(param=> delete reqQuery[param])
+    
+    let queryStr = JSON.stringify(reqQuery);
 
-  // Add $ before MongoDB operators
-  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
+    // Add $ before MongoDB operators
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
 
-  query = BootCamp.find(JSON.parse(queryStr));
+    query = BootCamp.find(JSON.parse(queryStr));
 
-  const bootcamps = await query;
+    //select all feilds
+    console.log(req.query.select)
+      if(req.query.select){
+        const feilds=req.query.select.split(',').join(' ');
+        query=query.select(feilds)
+    }
+    //sort
 
-  res.status(200).json({
-    success: true,
-    count: bootcamps.length,
-    data: bootcamps
-  });
-});
+    if(req.query.sort){
+        const sortBy=req.query.select.split(',').join(' ');
+        query=query.sort(sortBy)
+    }else{
+        query=query.sort('-createdAt')
+    }
+
+
+    const bootcamps = await query;
+    
+  
+    res.status(200).json({
+        success: true,
+        count: bootcamps.length,
+        data: bootcamps
+    });
+    });
 
 //@desc get single bootcamp
 //@route GET /api/v1/bootcamps/:id
