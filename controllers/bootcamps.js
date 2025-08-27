@@ -1,16 +1,34 @@
 const BootCamp=require('../models/BootCamp');
 const ErrorResponse = require('../utills/errorResponse');
-const asyncHandler=require("../middleware/async")
+const asyncHandler=require("../middleware/async");
+const geocoder = require('../utills/geocoder');
+const qs=require('qs')
 //@desc get all bootcamps
 //@route GET /api/v1/bootcamps
 //access private
 
-exports.getBootCamps=asyncHandler(async(req,res,next)=>{
-    
-        const bootcamps=await BootCamp.find();
-        res.status(200).json({success:true,count:bootcamps.length,data:bootcamps})
-    
-})
+exports.getBootCamps = asyncHandler(async (req, res, next) => {
+  let query;
+
+  // Parse query string properly
+  let queryObj = qs.parse(req.query);
+
+  let queryStr = JSON.stringify(queryObj);
+
+  // Add $ before MongoDB operators
+  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`);
+
+  query = BootCamp.find(JSON.parse(queryStr));
+
+  const bootcamps = await query;
+
+  res.status(200).json({
+    success: true,
+    count: bootcamps.length,
+    data: bootcamps
+  });
+});
+
 //@desc get single bootcamp
 //@route GET /api/v1/bootcamps/:id
 //access private
@@ -59,4 +77,29 @@ exports.deleteBootCamp=asyncHandler(async(req,res,next)=>{
             )  
     }
     res.status(200).json({success:true,data:bootcamp})
+})
+
+//@desc GET bootcamp within radius 
+//@route GET /api/v1/bootcamps/radius/:zipcode/:distance
+//access private
+exports.getBootCampInRadius=asyncHandler(async(req,res,next)=>{
+     const {zipcode,distance}=req.params;
+
+     const loc=await geocoder.geocode(zipcode);
+     const lat=loc[0].latitude;
+     const lng=loc[0].longitude;
+
+     //calc radius using radians
+     //divide distance by radius of earth
+     //earth radius =3963 mi/6378km
+     const radius=distance/3963;
+
+     const bootcamps=await BootCamp.find({
+        location:{$geoWithin:{$centerSphere:[[lng,lat],radius]}}
+     })
+     res.status(200).json({
+        success:true,
+        count:bootcamps.length,
+        data:bootcamps
+     })
 })
