@@ -19,6 +19,7 @@ if(process.env.NODE_ENV==='development'){
 }
 
 app.use('/api/v1/bootcamps',require('./routes/bootcamp'))
+app.use('/api/v1/courses',require('./routes/courses'))
 
 app.use(errorHandler)
 const PORT=process.env.PORT;
