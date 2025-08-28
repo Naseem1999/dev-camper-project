@@ -4,7 +4,7 @@ const courseRouter=require('./courses')
 const {getBootCamp,getBootCamps,createBootCamp,updateBootCamp,deleteBootCamp,getBootCampInRadius} =require('../controllers/bootcamps')
 const router=express.Router()
 //re-route into other resource route
-router.use('/:bootcamp/courses',courseRouter)
+router.use('/:bootcampid/courses',courseRouter)
 
 
 router.route('/radius/:zipcode/:distance').get(getBootCampInRadius)
