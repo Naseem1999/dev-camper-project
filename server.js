@@ -1,6 +1,7 @@
 const dotenv=require('dotenv')
 const path=require('path')
 const express=require('express')
+const cookieParser=require('cookie-parser')
 // const logger=require('./middleware/logger')
 const morgan=require('morgan')
 const colors=require('colors')
@@ -13,6 +14,8 @@ connectDb();
 const app=express();
 //express body parser
 app.use(express.json())
+//cookie parser
+app.use(cookieParser())
 
 // app.use(logger)
 //Dev logging middleware
