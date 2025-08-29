@@ -19,7 +19,6 @@ const errorHandler=(err,req,res,next)=>{
         const message=`Duplicate feild value entered`;
         error=new ErrorResponse(message,400)
     }
-    console.log(err)
 
     res.status(error.statusCode || 500).json({
         success:false,
