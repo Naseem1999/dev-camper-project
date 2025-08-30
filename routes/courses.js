@@ -3,12 +3,12 @@ const {getCourses,getSingleCourse,addCourse,updateCourse,deleteCourse} =require(
 const advancedResults=require('../middleware/advanceResult');
 const Course=require('../models/Course')
 const router=express.Router({mergeParams:true})
-
+const {protect}=require('../middleware/auth')
 
 router.route('/').get(advancedResults(Course,{
     path:'bootcamp',
     select:'name description'
-}),getCourses).post(addCourse)
-router.route('/:id').get(getSingleCourse).put(updateCourse).delete(deleteCourse)
+}),getCourses).post(protect,addCourse)
+router.route('/:id').get(getSingleCourse).put(protect,updateCourse).delete(protect,deleteCourse)
 
 module.exports=router
