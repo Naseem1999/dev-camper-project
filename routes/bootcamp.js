@@ -1,6 +1,7 @@
 const express=require('express')
 //include other resource router
 const courseRouter=require('./courses')
+const reviewsRouter=require('./reviews')
 const {getBootCamp,getBootCamps,createBootCamp,updateBootCamp,deleteBootCamp,getBootCampInRadius,bootcampPhotoUpload} =require('../controllers/bootcamps')
 const advancedResults=require('../middleware/advanceResult');
 const BootCamp=require('../models/BootCamp')
@@ -8,6 +9,7 @@ const {protect,autorize}=require('../middleware/auth')
 const router=express.Router()
 //re-route into other resource route
 router.use('/:bootcampid/courses',courseRouter)
+router.use('/:bootcampid/reviews',reviewsRouter)
 
 
 router.route('/radius/:zipcode/:distance').get(getBootCampInRadius)
